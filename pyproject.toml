@@ -1,33 +1,59 @@
 [build-system]
-requires = [
-    "setuptools>=64.0.0",
-    "wheel",
-    "setuptools-scm>=8",
-]
+# >=77 for PEP 639 SPDX `license` strings. pip's default build isolation fetches
+# this automatically; with --no-build-isolation an older setuptools will reject it.
+requires = ["setuptools>=77", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "SwinUNETR_MSPE"
+name = "mspe-swin"
+# Derived from git tags by setuptools-scm; see [tool.setuptools_scm] below.
 dynamic = ["version"]
+description = "Multi-Scale Patch Embedding for robust SwinUNETR across input resolutions"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
 authors = [
-  {name = "Aleksandr Sinitca", email = "amsinitca@etu.ru"},
+    { name = "Aleksandr Lonchakov" },
+    { name = "Dmitrii Kaplun" },
+    { name = "Aleksandr Sinitca", email = "amsinitca@etu.ru" },
 ]
 maintainers = [
-  {name = "Aleksandr Sinitca", email = "amsinitca@etu.ru"}
+    { name = "Aleksandr Sinitca", email = "amsinitca@etu.ru" },
 ]
-description = ""
-readme = "README.md"
-license = "Apache-2.0"
-dependencies = [
+keywords = [
+    "segmentation", "vision-transformer", "swin", "unetr",
+    "patch-embedding", "multi-resolution", "medical-imaging", "monai",
+]
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Image Recognition",
+    "Programming Language :: Python :: 3",
+]
 
+# Runtime deps only. requirements.txt additionally pins the exact versions the
+# reported experiments ran on, plus notebook-only extras such as wandb.
+dependencies = [
+    "torch>=2.4",
+    "monai>=1.4",
+    "numpy>=1.24",
+    # MONAI pulls einops through optional_import, but SwinUNETR calls rearrange on
+    # every forward pass, so it is required rather than optional for us.
+    "einops>=0.8",
 ]
 
 [project.urls]
 Repository = "https://github.com/Digiratory/SwinUNETR-MSPE"
 Issues = "https://github.com/Digiratory/SwinUNETR-MSPE/issues"
 
+[tool.setuptools]
+# Explicit: this is a flat-layout repo whose root also holds notebooks and docs, so
+# setuptools auto-discovery would fail on multiple top-level dirs. Only MSPE ships.
+packages = ["MSPE"]
+
 [tool.setuptools_scm]
-version_file = "SwinUNETR_MSPE/_version.py"
+# Digiratory release convention: versions come from `release/<version>` tags, so a
+# release is cut by tagging rather than by editing this file.
+version_file = "MSPE/_version.py"
 tag_regex = "^release/(.+?)(?:-.+)?$"
 version_scheme = "release-branch-semver"
 local_scheme = "no-local-version"
